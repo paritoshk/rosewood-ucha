@@ -50,5 +50,16 @@ export async function POST(req: Request) {
   };
 
   await addRequest(request);
-  return NextResponse.json(request, { status: 201 });
+
+  // Spoken-confirmation line handed back to the agent so Üchá can read the
+  // guest context and any VIP escalation back to the staff member — not just
+  // "dispatched to maintenance".
+  const dept = department.replace('_', ' ');
+  let result = `Logged${request.room ? ` for room ${request.room}` : ''}`;
+  if (guest) result += ` — ${guest.name}, ${guest.tier} guest`;
+  result += `. Routed to ${dept}, ${finalPriority} priority`;
+  if (request.escalated) result += `, escalated for VIP`;
+  result += eta_minutes ? `, ETA ${eta_minutes} minutes.` : '.';
+
+  return NextResponse.json({ request, result }, { status: 201 });
 }

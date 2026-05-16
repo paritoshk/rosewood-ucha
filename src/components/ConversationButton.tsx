@@ -40,9 +40,12 @@ function ConversationInner() {
         body: JSON.stringify({ department, priority, summary, room, eta_minutes }),
       });
       if (!res.ok) return "Error creating dispatch";
-      const request = (await res.json()) as DispatchRequest;
+      const { request, result } = (await res.json()) as {
+        request: DispatchRequest;
+        result: string;
+      };
       await addRequest(request);
-      return `Dispatched to ${request.department}`;
+      return result;
     } catch {
       return "Dispatch failed";
     }
