@@ -6,6 +6,8 @@ import {
   IconSpeakerphone,
   IconList,
   IconUsers,
+  IconBed,
+  IconChartBar,
   IconSettings,
 } from "@tabler/icons-react";
 
@@ -13,6 +15,8 @@ const NAV_ITEMS = [
   { href: "/dispatch", icon: IconSpeakerphone, label: "Dispatch" },
   { href: "/activity", icon: IconList, label: "Activity" },
   { href: "/guests", icon: IconUsers, label: "Guests" },
+  { href: "/rooms", icon: IconBed, label: "Rooms" },
+  { href: "/insights", icon: IconChartBar, label: "Insights" },
   { href: "/settings", icon: IconSettings, label: "Settings" },
 ] as const;
 
