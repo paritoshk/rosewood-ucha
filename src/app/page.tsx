@@ -1,63 +1,189 @@
-import Image from "next/image";
+"use client";
+
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { Button } from "@/components/ui/button";
+
+const ROLES = [
+  { value: "front_desk", label: "Front Desk" },
+  { value: "housekeeping", label: "Housekeeping" },
+  { value: "maintenance", label: "Maintenance" },
+  { value: "concierge", label: "Concierge" },
+  { value: "room_service", label: "Room Service" },
+  { value: "management", label: "Management" },
+];
+
+const GREEN = "#1C3A2D";
+const PARCHMENT = "#F4EFE4";
+const NEAR_BLACK = "#0D0D0D";
+const GOLD = "#C9A84C";
 
 export default function Home() {
+  const [name, setName] = useState("");
+  const [role, setRole] = useState("");
+  const router = useRouter();
+
+  const canEnter = name.trim().length > 0 && role.length > 0;
+
+  const handleEnter = () => {
+    if (!canEnter) return;
+    if (typeof window !== "undefined") {
+      sessionStorage.setItem("staff_name", name.trim());
+      sessionStorage.setItem("staff_role", role);
+    }
+    router.push("/dispatch");
+  };
+
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
+    <div className="flex flex-1 min-h-screen">
+      {/* Left panel */}
+      <aside
+        className="hidden lg:flex flex-col justify-between p-16 w-[440px] shrink-0"
+        style={{ background: GREEN }}
+      >
+        <div>
+          <p
+            className="text-xs tracking-[0.3em] uppercase mb-10"
+            style={{ color: GOLD, fontFamily: "var(--font-geist-sans)" }}
+          >
+            Est. 1979
+          </p>
+          <h1
+            className="text-6xl font-light leading-[1.1]"
+            style={{
+              fontFamily: "var(--font-cormorant)",
+              color: PARCHMENT,
+              fontStyle: "italic",
+            }}
+          >
+            Rosewood
+            <br />
+            Hotel
+            <br />
+            Collection
           </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
+        </div>
+
+        <div>
+          <div style={{ width: 40, height: 1, background: PARCHMENT, opacity: 0.25, marginBottom: 20 }} />
+          <p
+            className="text-xs tracking-[0.25em] uppercase"
+            style={{ color: PARCHMENT, opacity: 0.4 }}
+          >
+            Staff Operations Portal
           </p>
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
+      </aside>
+
+      {/* Right panel */}
+      <main
+        className="flex flex-1 flex-col justify-center px-8 sm:px-16 lg:px-24 py-16"
+        style={{ background: PARCHMENT }}
+      >
+        {/* Mobile brand */}
+        <div className="lg:hidden mb-10">
+          <p
+            className="text-xs tracking-[0.3em] uppercase"
+            style={{ color: GREEN }}
           >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
+            Rosewood Hotel Collection
+          </p>
+        </div>
+
+        <div className="max-w-md w-full">
+          <p
+            className="text-xs tracking-[0.2em] uppercase mb-3"
+            style={{ color: NEAR_BLACK, opacity: 0.45 }}
           >
-            Documentation
-          </a>
+            Staff Portal
+          </p>
+          <h2
+            className="text-5xl font-light leading-[1.15] mb-12"
+            style={{ fontFamily: "var(--font-cormorant)", color: NEAR_BLACK }}
+          >
+            Welcome.
+            <br />
+            <span style={{ fontStyle: "italic" }}>Please identify yourself.</span>
+          </h2>
+
+          <div className="space-y-9">
+            {/* Name */}
+            <div className="space-y-2">
+              <Label
+                htmlFor="name"
+                className="text-xs tracking-[0.15em] uppercase"
+                style={{ color: NEAR_BLACK, opacity: 0.5 }}
+              >
+                Your Name
+              </Label>
+              <Input
+                id="name"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                onKeyDown={(e) => e.key === "Enter" && handleEnter()}
+                placeholder="Full name"
+                autoComplete="off"
+                className="bg-transparent border-0 border-b rounded-none px-0 h-10 text-base placeholder:opacity-30 focus-visible:ring-0 focus-visible:outline-none"
+                style={{
+                  borderBottom: `1px solid ${NEAR_BLACK}26`,
+                  color: NEAR_BLACK,
+                  fontFamily: "var(--font-geist-sans)",
+                }}
+              />
+            </div>
+
+            {/* Role */}
+            <div className="space-y-3">
+              <p
+                className="text-xs tracking-[0.15em] uppercase"
+                style={{ color: NEAR_BLACK, opacity: 0.5 }}
+              >
+                Your Role
+              </p>
+              <RadioGroup
+                value={role}
+                onValueChange={setRole}
+                className="grid grid-cols-2 gap-x-6 gap-y-3"
+              >
+                {ROLES.map((r) => (
+                  <div key={r.value} className="flex items-center gap-2.5">
+                    <RadioGroupItem
+                      value={r.value}
+                      id={r.value}
+                      style={{
+                        borderColor: role === r.value ? GREEN : `${NEAR_BLACK}40`,
+                        color: GREEN,
+                      }}
+                    />
+                    <Label
+                      htmlFor={r.value}
+                      className="text-sm cursor-pointer font-normal tracking-wide"
+                      style={{ color: NEAR_BLACK }}
+                    >
+                      {r.label}
+                    </Label>
+                  </div>
+                ))}
+              </RadioGroup>
+            </div>
+
+            {/* Submit */}
+            <Button
+              onClick={handleEnter}
+              disabled={!canEnter}
+              className="w-full h-12 rounded-none text-xs tracking-[0.25em] uppercase transition-all duration-200 mt-2"
+              style={{
+                background: canEnter ? GREEN : `${GREEN}40`,
+                color: canEnter ? PARCHMENT : `${PARCHMENT}80`,
+                border: "none",
+              }}
+            >
+              Enter Dispatch Board
+            </Button>
+          </div>
         </div>
       </main>
     </div>
