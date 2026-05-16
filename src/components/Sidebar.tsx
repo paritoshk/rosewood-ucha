@@ -2,58 +2,13 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useState } from "react";
 import {
   IconSpeakerphone,
   IconList,
   IconUsers,
   IconSettings,
-  IconPlayerPlay,
-  IconLoader2,
+  IconPresentation,
 } from "@tabler/icons-react";
-import { nanoid } from "nanoid";
-
-const DEMO_SCRIPT = [
-  {
-    department: "housekeeping" as const,
-    priority: "urgent" as const,
-    summary: "Guest requests immediate room refresh before dinner",
-    room: "814",
-    guestName: "Mrs. Chen Wei",
-    guestTier: "Pinnacle" as const,
-    guestPrefs: "Hypoallergenic bedding, no fragrance",
-    status: "pending" as const,
-    eta: "5 min",
-    transcript: "Room 814 needs an urgent turndown before the Fontaines arrive for dinner.",
-    acknowledgment: "Urgent turndown dispatched to room 814. Team is on their way.",
-  },
-  {
-    department: "concierge" as const,
-    priority: "normal" as const,
-    summary: "Arrange Tesla transfer to SFO Terminal 3, 5AM tomorrow",
-    room: "1204",
-    guestName: "Dr. Amara Osei",
-    guestTier: "Pinnacle" as const,
-    guestPrefs: "Quiet floor, high level",
-    status: "pending" as const,
-    eta: "Confirmed",
-    transcript: "Dr. Osei in 1204 needs a car to the airport tomorrow morning, 5AM, Terminal 3.",
-    acknowledgment: "Tesla transfer to SFO Terminal 3 confirmed for 5AM. Dr. Osei is all set.",
-  },
-  {
-    department: "maintenance" as const,
-    priority: "urgent" as const,
-    summary: "Flooding under bathroom sink, water pooling on floor",
-    room: "612",
-    guestName: "",
-    guestTier: "Standard" as const,
-    guestPrefs: "",
-    status: "pending" as const,
-    eta: "5 min",
-    transcript: "Room 612 has water coming from under the sink, there's pooling on the bathroom floor.",
-    acknowledgment: "Maintenance dispatched to 612 immediately. We're on it.",
-  },
-];
 
 const NAV_ITEMS = [
   { href: "/dispatch", icon: IconSpeakerphone, label: "Dispatch" },
@@ -64,25 +19,6 @@ const NAV_ITEMS = [
 
 export function Sidebar() {
   const pathname = usePathname();
-  const [running, setRunning] = useState(false);
-
-  async function runDemo() {
-    if (running) return;
-    setRunning(true);
-    try {
-      for (const step of DEMO_SCRIPT) {
-        const request = { ...step, id: nanoid(), createdAt: new Date().toISOString() };
-        await fetch("/api/requests", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(request),
-        });
-        await new Promise((r) => setTimeout(r, 1200));
-      }
-    } finally {
-      setRunning(false);
-    }
-  }
 
   return (
     <aside
@@ -143,36 +79,30 @@ export function Sidebar() {
         })}
       </nav>
 
-      {/* Bottom controls */}
+      {/* Bottom: Demo link + property badge */}
       <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 12 }}>
-        {/* Launch Demo */}
-        <button
-          onClick={runDemo}
-          disabled={running}
-          title="Launch Demo"
+        <Link
+          href="/demo"
+          title="Live Demo"
           style={{
             width: 36,
             height: 36,
             borderRadius: "50%",
-            border: "1px solid rgba(244,239,228,0.35)",
-            background: running ? "rgba(244,239,228,0.12)" : "transparent",
+            border: pathname === "/demo"
+              ? "1px solid var(--rw-parchment)"
+              : "1px solid rgba(244,239,228,0.35)",
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
-            cursor: running ? "wait" : "pointer",
             color: "var(--rw-parchment)",
-            opacity: running ? 0.7 : 1,
-            transition: "background 0.15s, opacity 0.15s",
+            opacity: pathname === "/demo" ? 1 : 0.6,
+            textDecoration: "none",
+            transition: "opacity 0.15s, border-color 0.15s",
           }}
         >
-          {running ? (
-            <IconLoader2 size={14} strokeWidth={1.5} style={{ animation: "spin 1s linear infinite" }} />
-          ) : (
-            <IconPlayerPlay size={14} strokeWidth={1.5} />
-          )}
-        </button>
+          <IconPresentation size={15} strokeWidth={1.5} />
+        </Link>
 
-        {/* Property initial */}
         <div
           style={{
             width: 30,

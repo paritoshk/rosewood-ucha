@@ -24,8 +24,11 @@ function ConversationInner() {
 
   const { status, isSpeaking, startSession, endSession } = useConversation({
     onConnect: () => setError(""),
-    onError: (err: unknown) =>
-      setError(typeof err === "string" ? err : "Connection error — try again."),
+    onError: (err: unknown) => {
+      if (typeof err === "string") setError(err);
+      else if (err instanceof Error) setError(err.message);
+      else setError("Connection error — try again.");
+    },
   });
 
   useConversationClientTool("create_dispatch", async (params: Record<string, unknown>) => {
@@ -80,9 +83,16 @@ function ConversationInner() {
       {error && (
         <span
           className="rw-label"
-          style={{ color: "var(--priority-urgent)", maxWidth: 220 }}
+          title={error}
+          style={{
+            color: "var(--priority-urgent)",
+            maxWidth: 200,
+            overflow: "hidden",
+            textOverflow: "ellipsis",
+            whiteSpace: "nowrap",
+          }}
         >
-          {error}
+          {error.length > 55 ? error.slice(0, 52) + "…" : error}
         </span>
       )}
       <button
