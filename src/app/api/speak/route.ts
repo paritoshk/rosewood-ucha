@@ -1,9 +1,7 @@
 export const runtime = 'nodejs';
 export const maxDuration = 30;
 
-// Default voice: "Lauren" (ElevenLabs) — friendly, comforting, soft; American
-// conversational. Voice ID DODLEQrClDo8wCz460ld.
-const DEFAULT_VOICE = 'DODLEQrClDo8wCz460ld';
+const LAUREN_VOICE_ID = 'DODLEQrClDo8wCz460ld';
 
 export async function POST(request: Request) {
   try {
@@ -15,17 +13,13 @@ export async function POST(request: Request) {
       );
     }
 
-    const { text, voice_id } = (await request.json()) as {
-      text?: string;
-      voice_id?: string;
-    };
+    const { text } = (await request.json()) as { text?: string };
     if (!text || !text.trim()) {
       return Response.json({ error: 'No text provided' }, { status: 400 });
     }
 
-    const voice = voice_id || DEFAULT_VOICE;
     const res = await fetch(
-      `https://api.elevenlabs.io/v1/text-to-speech/${voice}`,
+      `https://api.elevenlabs.io/v1/text-to-speech/${LAUREN_VOICE_ID}`,
       {
         method: 'POST',
         headers: {
@@ -36,7 +30,7 @@ export async function POST(request: Request) {
         body: JSON.stringify({
           text: text.trim(),
           model_id: 'eleven_flash_v2_5',
-          voice_settings: { stability: 0.8, similarity_boost: 0.75 },
+          voice_settings: { stability: 0.8, similarity_boost: 0.75, style: 0.3 },
         }),
       },
     );

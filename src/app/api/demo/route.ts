@@ -11,7 +11,7 @@ export const maxDuration = 45;
 
 const ELEVEN_KEY = process.env.ELEVENLABS_API_KEY!;
 // Staff voice for demo — different from Lauren so it sounds like a real staff member speaking
-const STAFF_VOICE_ID = '29vD33N1CtxCmqQRPOHJ'; // Drew — warm, clear, male
+const LAUREN_VOICE_ID = 'DODLEQrClDo8wCz460ld';
 
 interface Routing {
   department: Department;
@@ -23,7 +23,7 @@ interface Routing {
 }
 
 async function textToAudio(text: string): Promise<Blob> {
-  const res = await fetch(`https://api.elevenlabs.io/v1/text-to-speech/${STAFF_VOICE_ID}`, {
+  const res = await fetch(`https://api.elevenlabs.io/v1/text-to-speech/${LAUREN_VOICE_ID}`, {
     method: 'POST',
     headers: { 'xi-api-key': ELEVEN_KEY, 'Content-Type': 'application/json' },
     body: JSON.stringify({
