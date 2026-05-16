@@ -31,7 +31,7 @@ ETA: urgent ~5 min, normal ~15 min, low ~30 min.
 
 Dispatch within 2 exchanges maximum. Ask at most one clarifying question.`;
 
-// Cached across requests — survives hot-reloads on the same Node process.
+// Cached per-process. Set ELEVENLABS_AGENT_ID in .env.local to skip creation entirely.
 let cachedAgentId: string | null = process.env.ELEVENLABS_AGENT_ID ?? null;
 
 async function ensureAgent(): Promise<string> {
@@ -57,25 +57,14 @@ async function ensureAgent(): Promise<string> {
                     department: {
                       type: 'string',
                       enum: ['housekeeping', 'maintenance', 'front_desk', 'concierge'],
-                      description: 'Hotel department to route this request to',
                     },
                     priority: {
                       type: 'string',
                       enum: ['urgent', 'normal', 'low'],
-                      description: 'Urgency level of the request',
                     },
-                    summary: {
-                      type: 'string',
-                      description: 'Concise action description, under 10 words, imperative voice',
-                    },
-                    room: {
-                      type: 'string',
-                      description: 'Room number exactly as said, or empty string if not mentioned',
-                    },
-                    eta_minutes: {
-                      type: 'integer',
-                      description: 'Realistic ETA in minutes: urgent=5, normal=15, low=30',
-                    },
+                    summary: { type: 'string' },
+                    room: { type: 'string' },
+                    eta_minutes: { type: 'integer' },
                   },
                   required: ['department', 'priority', 'summary', 'room', 'eta_minutes'],
                 },
@@ -87,9 +76,7 @@ async function ensureAgent(): Promise<string> {
         },
         tts: {
           voice_id: LAUREN_VOICE,
-          model_id: 'eleven_turbo_v2_5',
-          stability: 0.8,
-          similarity_boost: 0.75,
+          model_id: 'eleven_flash_v2',
         },
       },
     }),
@@ -97,6 +84,8 @@ async function ensureAgent(): Promise<string> {
 
   if (!res.ok) {
     const body = await res.text();
+    // Don't cache a bad ID — clear so the next request retries creation.
+    cachedAgentId = null;
     throw new Error(`ElevenLabs agent creation failed: ${body}`);
   }
 
