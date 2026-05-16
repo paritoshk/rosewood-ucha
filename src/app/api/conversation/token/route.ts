@@ -87,7 +87,7 @@ async function ensureAgent(): Promise<string> {
         },
         tts: {
           voice_id: LAUREN_VOICE,
-          model_id: 'eleven_flash_v2_5',
+          model_id: 'eleven_turbo_v2_5',
           stability: 0.8,
           similarity_boost: 0.75,
         },
