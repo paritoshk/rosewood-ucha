@@ -1,36 +1,70 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Üchá — Voice-First Hotel Dispatch
 
-## Getting Started
+Staff press one button, speak a request ("Room 412 needs extra towels"), and Üchá
+transcribes it, routes it to the right department, enriches it with guest-360
+context, and reads back a confirmation. One button, one voice, zero dropped
+requests.
 
-First, run the development server:
+Built for the **Hospitality 2030** hackathon @ Rosewood Sand Hill.
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+## How it works
+
+```
+🎙️  MediaRecorder  →  /api/transcribe (ElevenLabs STT)
+                    →  /api/dispatch   (Claude routes + fake CRM enrichment)
+                    →  /api/speak      (ElevenLabs TTS acknowledgment)
+                    →  Dispatch board  (4 departments, live)
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+- **Routing brain** — `claude-sonnet-4-6` classifies each request into
+  housekeeping / maintenance / front desk / concierge with a priority and ETA.
+- **CRM enrichment** — the room number is resolved against a fake CRM modeled on
+  Rosewood's real stack (Oracle OPERA + Hapi→Salesforce guest-360). VIP / Pinnacle
+  guests get their priority auto-escalated.
+- **Live state** — Upstash Redis when configured; falls back to in-memory state
+  so it runs with zero setup.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Setup
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```bash
+cp .env.local.example .env.local   # add your keys
+pnpm install
+pnpm dev                           # http://localhost:3000
+```
 
-## Learn More
+### Environment variables
 
-To learn more about Next.js, take a look at the following resources:
+| Variable                   | Required | Purpose                          |
+|----------------------------|----------|----------------------------------|
+| `ANTHROPIC_API_KEY`        | yes      | Claude dispatch routing          |
+| `ELEVENLABS_API_KEY`       | yes      | Speech-to-text + text-to-speech  |
+| `UPSTASH_REDIS_REST_URL`   | optional | Persist the board across refresh |
+| `UPSTASH_REDIS_REST_TOKEN` | optional | Upstash REST token               |
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+Without the Upstash vars, Üchá uses in-memory state — fine for a single-process
+demo. Add them to persist the board across refreshes and devices. Provision
+Upstash Redis from the Vercel Marketplace (auto-injects both vars) or at
+[upstash.com](https://upstash.com).
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Demo
 
-## Deploy on Vercel
+- `/` — live console: hold the mic button (or hold **SPACE**) and speak.
+- `/demo` — judge cheat mode: fires 3 scripted requests end-to-end on 3s intervals.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+Try *"Room 412 needs extra towels"* — guest Eleanor Whitfield (Pinnacle VIP) is
+resolved from the CRM and the request is auto-escalated.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Deploy to Vercel
+
+```bash
+vercel link
+vercel env add ANTHROPIC_API_KEY
+vercel env add ELEVENLABS_API_KEY
+# add UPSTASH_* vars (or install Upstash Redis from the Vercel Marketplace)
+vercel deploy --prod
+```
+
+## Stack
+
+Next.js 16 (App Router) · React 19 · TypeScript · Tailwind v4 ·
+ElevenLabs · Anthropic Claude · Upstash Redis · Vercel

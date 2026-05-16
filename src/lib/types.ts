@@ -15,6 +15,12 @@ export interface DispatchRequest {
   status: Status;
   createdAt: string;
   eta?: string;
+  /** Spoken acknowledgment from Üchá (set by /api/voice). */
+  acknowledgment?: string;
+  /** Raw transcript the request was routed from (set by /api/voice). */
+  transcript?: string;
+  /** True when priority was bumped because the guest is a VIP/Pinnacle. */
+  escalated?: boolean;
 }
 
 export interface Guest {

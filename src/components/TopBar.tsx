@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
-import { IconPlayerPlay } from "@tabler/icons-react";
+import { VoiceButton } from "@/components/VoiceButton";
 
 const PAGE_NAMES: Record<string, string> = {
   "/dispatch": "Dispatch",
@@ -93,12 +93,9 @@ export function TopBar() {
         {time}
       </div>
 
-      {/* Right */}
+      {/* Right — push-to-talk, available from every page */}
       <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
-        <button className="rw-btn-ghost" style={{ display: "flex", alignItems: "center", gap: 6 }}>
-          <IconPlayerPlay size={10} />
-          Demo Mode
-        </button>
+        <VoiceButton />
         <span className="rw-label" style={{ opacity: 0.6 }}>
           Rosewood Sand Hill
         </span>

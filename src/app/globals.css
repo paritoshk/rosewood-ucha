@@ -155,3 +155,41 @@
   70% { box-shadow: 0 0 0 10px rgba(192, 57, 43, 0); }
   100% { box-shadow: 0 0 0 0 rgba(192, 57, 43, 0); }
 }
+
+/* Rosewood-style luxury serif — wordmark and headings. */
+.font-display {
+  font-family: var(--font-display), Georgia, "Times New Roman", serif;
+}
+
+/* Push-to-talk button states */
+@keyframes ucha-pulse {
+  0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.55); }
+  100% { box-shadow: 0 0 0 26px rgba(239, 68, 68, 0); }
+}
+@keyframes ucha-spin {
+  to { transform: rotate(360deg); }
+}
+.ucha-recording {
+  animation: ucha-pulse 1.3s infinite;
+}
+.ucha-processing::after {
+  content: "";
+  position: absolute;
+  inset: -6px;
+  border-radius: 9999px;
+  border: 3px solid transparent;
+  border-top-color: var(--gold);
+  animation: ucha-spin 0.9s linear infinite;
+}
+
+@keyframes ucha-rise {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.ucha-rise {
+  animation: ucha-rise 0.28s ease-out;
+}
+
+::-webkit-scrollbar { width: 8px; height: 8px; }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius: 8px; }
+::-webkit-scrollbar-track { background: transparent; }
