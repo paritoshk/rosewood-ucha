@@ -2,6 +2,8 @@
 
 import { useState } from "react";
 import type { DispatchRequest } from "@/lib/types";
+import { DispatchBoard } from "@/components/DispatchBoard";
+import { useDispatch } from "@/context/DispatchContext";
 
 const DEPT_COLORS: Record<string, string> = {
   housekeeping: "var(--priority-normal)",
@@ -77,6 +79,7 @@ interface Result {
 }
 
 export default function DemoPage() {
+  const { addRequest } = useDispatch();
   const [steps, setSteps] = useState<Record<number, Step>>({});
   const [results, setResults] = useState<Record<number, Result>>({});
   const [errors, setErrors] = useState<Record<number, string>>({});
@@ -163,6 +166,9 @@ export default function DemoPage() {
         return;
       }
       setResults((r) => ({ ...r, [id]: data as Result }));
+      // Push the routed card into context immediately so the board updates now,
+      // without waiting for the next 3s poll.
+      addRequest((data as Result).request);
       setStep(id, "done");
       // Üchá reads her acknowledgment back — the other half of the conversation.
       await playClip((data as Result).request.acknowledgment ?? "", {
@@ -625,6 +631,30 @@ export default function DemoPage() {
         })}
       </div>
 
+      {/* Live Dispatch Board */}
+      <div style={{ marginTop: 48 }}>
+        <div style={{ marginBottom: 20 }}>
+          <h2
+            style={{
+              fontFamily: "var(--font-cormorant), 'Cormorant Garamond', serif",
+              fontSize: 22,
+              fontWeight: 300,
+              fontStyle: "italic",
+              color: "var(--rw-ink)",
+              margin: 0,
+              marginBottom: 6,
+            }}
+          >
+            Live Dispatch Board
+          </h2>
+          <p style={{ fontSize: 12, color: "var(--rw-ink-muted)", margin: 0, lineHeight: 1.6 }}>
+            Tickets routed by the scenarios above appear here in real time. The board polls every 3 s
+            — run a scenario and watch the card land.
+          </p>
+        </div>
+        <DispatchBoard />
+      </div>
+
       {/* Footer note */}
       <div
         style={{
@@ -636,12 +666,8 @@ export default function DemoPage() {
           lineHeight: 1.7,
         }}
       >
-        Cards appear on the{" "}
-        <a href="/dispatch" style={{ color: "var(--rw-green)", textDecoration: "none" }}>
-          Dispatch board
-        </a>{" "}
-        in real time. For a live demo, use the <strong>Hold to speak</strong> button in the top bar
-        — hold it, speak any hotel request, release, and the full pipeline runs with your voice.
+        Use the <strong>Hold to speak</strong> button in the top bar for live voice dispatch — hold,
+        speak any hotel request, release, and the full pipeline runs with your voice.
       </div>
       </div>
     </div>
