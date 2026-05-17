@@ -3,6 +3,7 @@
 import { useState } from "react";
 import type { DispatchRequest } from "@/lib/types";
 import { DispatchBoard } from "@/components/DispatchBoard";
+import { useDispatch } from "@/context/DispatchContext";
 
 const DEPT_COLORS: Record<string, string> = {
   housekeeping: "var(--priority-normal)",
@@ -78,6 +79,7 @@ interface Result {
 }
 
 export default function DemoPage() {
+  const { addRequest } = useDispatch();
   const [steps, setSteps] = useState<Record<number, Step>>({});
   const [results, setResults] = useState<Record<number, Result>>({});
   const [errors, setErrors] = useState<Record<number, string>>({});
@@ -164,6 +166,9 @@ export default function DemoPage() {
         return;
       }
       setResults((r) => ({ ...r, [id]: data as Result }));
+      // Push the routed card into context immediately so the board updates now,
+      // without waiting for the next 3s poll.
+      addRequest((data as Result).request);
       setStep(id, "done");
       // Üchá reads her acknowledgment back — the other half of the conversation.
       await playClip((data as Result).request.acknowledgment ?? "", {
