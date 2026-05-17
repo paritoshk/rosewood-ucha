@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import type { DispatchRequest } from "@/lib/types";
+import { DispatchBoard } from "@/components/DispatchBoard";
 
 const DEPT_COLORS: Record<string, string> = {
   housekeeping: "var(--priority-normal)",
@@ -625,6 +626,30 @@ export default function DemoPage() {
         })}
       </div>
 
+      {/* Live Dispatch Board */}
+      <div style={{ marginTop: 48 }}>
+        <div style={{ marginBottom: 20 }}>
+          <h2
+            style={{
+              fontFamily: "var(--font-cormorant), 'Cormorant Garamond', serif",
+              fontSize: 22,
+              fontWeight: 300,
+              fontStyle: "italic",
+              color: "var(--rw-ink)",
+              margin: 0,
+              marginBottom: 6,
+            }}
+          >
+            Live Dispatch Board
+          </h2>
+          <p style={{ fontSize: 12, color: "var(--rw-ink-muted)", margin: 0, lineHeight: 1.6 }}>
+            Tickets routed by the scenarios above appear here in real time. The board polls every 3 s
+            — run a scenario and watch the card land.
+          </p>
+        </div>
+        <DispatchBoard />
+      </div>
+
       {/* Footer note */}
       <div
         style={{
@@ -636,12 +661,8 @@ export default function DemoPage() {
           lineHeight: 1.7,
         }}
       >
-        Cards appear on the{" "}
-        <a href="/dispatch" style={{ color: "var(--rw-green)", textDecoration: "none" }}>
-          Dispatch board
-        </a>{" "}
-        in real time. For a live demo, use the <strong>Hold to speak</strong> button in the top bar
-        — hold it, speak any hotel request, release, and the full pipeline runs with your voice.
+        Use the <strong>Hold to speak</strong> button in the top bar for live voice dispatch — hold,
+        speak any hotel request, release, and the full pipeline runs with your voice.
       </div>
       </div>
     </div>
