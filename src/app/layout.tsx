@@ -20,8 +20,43 @@ const cormorant = Cormorant_Garamond({
 });
 
 export const metadata: Metadata = {
-  title: "Üchá — Rosewood Staff Portal",
-  description: "Hotel operations dispatch system",
+  title: {
+    default: "Üchá — Voice-First Hotel Dispatch",
+    template: "%s | Üchá",
+  },
+  description:
+    "Staff press one button, speak a request, and Üchá transcribes, routes, enriches with guest-360 context, and confirms — in seconds. Zero dropped requests.",
+  metadataBase: new URL("https://ucha.vercel.app"),
+  keywords: [
+    "hotel dispatch",
+    "voice AI",
+    "hospitality",
+    "operations",
+    "Rosewood",
+    "ElevenLabs",
+    "Claude",
+    "concierge",
+  ],
+  authors: [{ name: "Üchá" }],
+  creator: "Üchá",
+  openGraph: {
+    type: "website",
+    locale: "en_US",
+    siteName: "Üchá",
+    title: "Üchá — Voice-First Hotel Dispatch",
+    description:
+      "One button, one voice, zero dropped requests. AI-powered dispatch for luxury hospitality.",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Üchá — Voice-First Hotel Dispatch",
+    description:
+      "One button, one voice, zero dropped requests. AI-powered dispatch for luxury hospitality.",
+  },
+  robots: {
+    index: true,
+    follow: true,
+  },
 };
 
 export default function RootLayout({
