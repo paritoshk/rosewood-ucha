@@ -2,7 +2,10 @@
 
 import { useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
+import Link from "next/link";
+import { IconPlayerPlay } from "@tabler/icons-react";
 import { VoiceButton } from "@/components/VoiceButton";
+import { ConversationButton } from "@/components/ConversationButton";
 
 const PAGE_NAMES: Record<string, string> = {
   "/dispatch": "Dispatch",
@@ -14,6 +17,7 @@ const PAGE_NAMES: Record<string, string> = {
 export function TopBar() {
   const pathname = usePathname();
   const [time, setTime] = useState("");
+  const [voiceMode, setVoiceMode] = useState<"push" | "live">("push");
 
   useEffect(() => {
     const tick = () => {
@@ -93,9 +97,33 @@ export function TopBar() {
         {time}
       </div>
 
-      {/* Right — push-to-talk, available from every page */}
+      {/* Right */}
       <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
-        <VoiceButton />
+        <Link
+          href="/demo"
+          className="rw-btn-ghost"
+          style={{ display: "flex", alignItems: "center", gap: 6 }}
+        >
+          <IconPlayerPlay size={10} />
+          Demo Mode
+        </Link>
+
+        {/* Voice control — hold-to-talk by default, live agent on toggle */}
+        <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+          {voiceMode === "push" ? <VoiceButton /> : <ConversationButton />}
+          <button
+            className="rw-btn-ghost"
+            onClick={() => setVoiceMode((m) => (m === "push" ? "live" : "push"))}
+            title={
+              voiceMode === "push"
+                ? "Switch to the live Üchá agent"
+                : "Switch to hold-to-talk"
+            }
+          >
+            {voiceMode === "push" ? "Live agent" : "Hold to speak"}
+          </button>
+        </div>
+
         <span className="rw-label" style={{ opacity: 0.6 }}>
           Rosewood Sand Hill
         </span>
