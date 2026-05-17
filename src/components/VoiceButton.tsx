@@ -29,6 +29,11 @@ export function VoiceButton() {
   const activeRef = useRef(false);
   const pressStartRef = useRef(0);
   const discardRef = useRef(false);
+  // Conversation memory across separate presses — sent to /api/voice each turn
+  // so Üchá remembers what was just said. Lasts for the page session.
+  const historyRef = useRef<{ role: "user" | "assistant"; content: string }[]>(
+    [],
+  );
   const [hint, setHint] = useState("");
 
   async function playAcknowledgment(text: string) {
@@ -54,6 +59,7 @@ export function VoiceButton() {
     try {
       const fd = new FormData();
       fd.append("audio", blob, "recording.webm");
+      fd.append("history", JSON.stringify(historyRef.current));
       const res = await fetch("/api/voice", { method: "POST", body: fd });
       const data = (await res.json()) as {
         request?: DispatchRequest;
@@ -67,6 +73,17 @@ export function VoiceButton() {
         return;
       }
       if (data.transcript) setLastTranscript(data.transcript);
+
+      // Remember this turn so the next press has conversational context.
+      const spoken = data.acknowledgment ?? data.reply ?? "";
+      if (data.transcript && spoken) {
+        historyRef.current = [
+          ...historyRef.current,
+          { role: "user", content: data.transcript },
+          { role: "assistant", content: spoken },
+        ].slice(-12);
+      }
+
       if (data.request) {
         // A new service request — drop the card on the board.
         await addRequest(data.request);
