@@ -83,7 +83,8 @@ export function RequestCard({ request }: Props) {
         }}
       />
 
-      {/* Guest block */}
+      {/* Guest block — only when the room resolved to a guest on file */}
+      {request.guestName && (
       <div style={{ marginBottom: 10 }}>
         <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 4 }}>
           <span
@@ -122,6 +123,7 @@ export function RequestCard({ request }: Props) {
           </p>
         )}
       </div>
+      )}
 
       {/* Bottom: ETA + action */}
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
