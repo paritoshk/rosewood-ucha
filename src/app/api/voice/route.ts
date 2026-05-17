@@ -84,19 +84,40 @@ export async function POST(req: Request) {
           .join('\n')
       : '(no active requests)';
 
+    // Prior turns of this hold-to-talk conversation. Each press is otherwise a
+    // fresh, stateless request — threading the history gives Üchá memory across
+    // separate presses, so "I'll take that one" knows what "that one" is.
+    let history: { role: 'user' | 'assistant'; content: string }[] = [];
+    const rawHistory = form.get('history');
+    if (typeof rawHistory === 'string') {
+      try {
+        const parsed = JSON.parse(rawHistory);
+        if (Array.isArray(parsed)) {
+          history = parsed
+            .filter(
+              (m) =>
+                m &&
+                (m.role === 'user' || m.role === 'assistant') &&
+                typeof m.content === 'string' &&
+                m.content.trim(),
+            )
+            .slice(-12);
+        }
+      } catch {
+        /* malformed history — proceed without it */
+      }
+    }
+
     const anthropic = new Anthropic({ apiKey: anthropicKey });
     const message = await anthropic.messages.create({
       model: DISPATCH_MODEL,
       max_tokens: 600,
       temperature: 0,
-      system: DISPATCH_SYSTEM_PROMPT,
+      // The board goes in the system prompt so each conversation turn stays a
+      // clean transcript and history doesn't carry stale board snapshots.
+      system: `${DISPATCH_SYSTEM_PROMPT}\n\nCURRENT BOARD (live):\n${boardSummary}`,
       tools: [ROUTE_TOOL],
-      messages: [
-        {
-          role: 'user',
-          content: `CURRENT BOARD:\n${boardSummary}\n\nStaff member said (voice transcript): "${transcript}"`,
-        },
-      ],
+      messages: [...history, { role: 'user', content: transcript }],
     });
 
     // No tool call → a question or status remark. Return the spoken reply, no card.

@@ -81,9 +81,11 @@ export default function DemoPage() {
   const [results, setResults] = useState<Record<number, Result>>({});
   const [errors, setErrors] = useState<Record<number, string>>({});
   const [runningAll, setRunningAll] = useState(false);
-  const [speaking, setSpeaking] = useState<{ id: number; who: string } | null>(
-    null,
-  );
+  const [speaking, setSpeaking] = useState<{
+    id: number;
+    who: string;
+    text: string;
+  } | null>(null);
 
   function setStep(id: number, step: Step) {
     setSteps((s) => ({ ...s, [id]: step }));
@@ -96,7 +98,7 @@ export default function DemoPage() {
     opts: { id: number; who: string; voiceId?: string },
   ): Promise<void> {
     if (!text?.trim()) return;
-    setSpeaking({ id: opts.id, who: opts.who });
+    setSpeaking({ id: opts.id, who: opts.who, text });
     try {
       const res = await fetch("/api/speak", {
         method: "POST",
@@ -194,11 +196,46 @@ export default function DemoPage() {
   return (
     <div
       style={{
-        padding: "40px 48px",
-        maxWidth: 900,
-        fontFamily: "var(--font-geist-sans), sans-serif",
+        position: "relative",
+        minHeight: "100%",
+        display: "flex",
+        justifyContent: "center",
+        overflow: "hidden",
       }}
     >
+      {/* Faded brand monogram filling the side whitespace */}
+      <div
+        aria-hidden
+        style={{
+          position: "absolute",
+          top: "50%",
+          left: "50%",
+          transform: "translate(-50%, -50%)",
+          fontFamily: "var(--font-cormorant), 'Cormorant Garamond', serif",
+          fontStyle: "italic",
+          fontWeight: 300,
+          fontSize: "min(135vh, 1500px)",
+          lineHeight: 1,
+          color: "var(--rw-gold)",
+          opacity: 0.06,
+          pointerEvents: "none",
+          userSelect: "none",
+          zIndex: 0,
+        }}
+      >
+        R
+      </div>
+
+      <div
+        style={{
+          position: "relative",
+          zIndex: 1,
+          width: "100%",
+          maxWidth: 900,
+          padding: "40px 48px",
+          fontFamily: "var(--font-geist-sans), sans-serif",
+        }}
+      >
       {/* Header */}
       <div style={{ marginBottom: 40 }}>
         <h1
@@ -366,27 +403,44 @@ export default function DemoPage() {
                 </button>
               </div>
 
-              {/* Now-speaking indicator — shows which voice is talking */}
+              {/* Now-speaking indicator — which voice is talking + live text */}
               {speaking?.id === scenario.id && (
                 <div
                   style={{
-                    padding: "8px 20px",
+                    padding: "10px 20px",
                     borderTop: "1px solid var(--rw-border)",
-                    display: "flex",
-                    alignItems: "center",
-                    gap: 8,
-                    fontSize: 11,
-                    letterSpacing: "0.04em",
                     color: "var(--rw-green)",
                     background: "rgba(46,125,82,0.05)",
                   }}
                 >
-                  <span style={{ animation: "ucha-pulse 1.3s infinite" }}>
-                    🔊
-                  </span>
-                  {speaking.who === "Staff"
-                    ? "Staff member speaking…"
-                    : "Üchá speaking…"}
+                  <div
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      gap: 8,
+                      fontSize: 11,
+                      letterSpacing: "0.04em",
+                      textTransform: "uppercase",
+                    }}
+                  >
+                    <span style={{ animation: "ucha-pulse 1.3s infinite" }}>
+                      🔊
+                    </span>
+                    {speaking.who === "Staff"
+                      ? "Staff member speaking"
+                      : "Üchá speaking"}
+                  </div>
+                  <div
+                    style={{
+                      marginTop: 4,
+                      fontSize: 12,
+                      fontStyle: "italic",
+                      lineHeight: 1.5,
+                      color: "var(--rw-ink)",
+                    }}
+                  >
+                    &ldquo;{speaking.text}&rdquo;
+                  </div>
                 </div>
               )}
 
@@ -586,8 +640,9 @@ export default function DemoPage() {
         <a href="/dispatch" style={{ color: "var(--rw-green)", textDecoration: "none" }}>
           Dispatch board
         </a>{" "}
-        in real time. For a live demo, use the <strong>Talk to Üchá</strong> button in the top bar
-        — speak any hotel request and the full pipeline runs with your voice.
+        in real time. For a live demo, use the <strong>Hold to speak</strong> button in the top bar
+        — hold it, speak any hotel request, release, and the full pipeline runs with your voice.
+      </div>
       </div>
     </div>
   );
