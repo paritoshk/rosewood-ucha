@@ -1,14 +1,22 @@
 import { readFile, writeFile } from 'node:fs/promises';
 import { join } from 'node:path';
 import { tmpdir } from 'node:os';
+import { Redis } from '@upstash/redis';
 import type { DispatchRequest, Status } from '@/lib/types';
 import { SEED_REQUESTS } from '@/lib/seed';
 
-// Persisted to a JSON file in the OS temp dir — outside the project tree so
-// writes don't trip the Next.js dev file watcher. A temp file survives
-// hot-reloads and server restarts; a module-level array does not (which made
-// dispatched requests vanish on the next poll).
+// Persistence backend. When Upstash Redis is configured the board is a single
+// shared key — every user, on every serverless instance, sees the same tickets.
+// Without it we fall back to a JSON file in the OS temp dir: fine for local dev,
+// but per-process only (a temp file is not shared across Vercel instances, which
+// is why dispatched tickets didn't persist across users in production).
+const REDIS_KEY = 'ucha:board:v2';
 const FILE = join(tmpdir(), 'ucha-board-v2.json');
+
+const redis =
+  process.env.UPSTASH_REDIS_REST_URL && process.env.UPSTASH_REDIS_REST_TOKEN
+    ? Redis.fromEnv()
+    : null;
 
 function isValid(parsed: unknown): parsed is DispatchRequest[] {
   return (
@@ -19,6 +27,12 @@ function isValid(parsed: unknown): parsed is DispatchRequest[] {
 }
 
 async function load(): Promise<DispatchRequest[]> {
+  if (redis) {
+    const parsed = await redis.get<DispatchRequest[]>(REDIS_KEY);
+    if (isValid(parsed)) return parsed;
+    await redis.set(REDIS_KEY, SEED_REQUESTS);
+    return [...SEED_REQUESTS];
+  }
   try {
     const parsed = JSON.parse(await readFile(FILE, 'utf8'));
     if (isValid(parsed)) return parsed;
@@ -30,6 +44,10 @@ async function load(): Promise<DispatchRequest[]> {
 }
 
 async function save(requests: DispatchRequest[]): Promise<void> {
+  if (redis) {
+    await redis.set(REDIS_KEY, requests);
+    return;
+  }
   await writeFile(FILE, JSON.stringify(requests));
 }
 
