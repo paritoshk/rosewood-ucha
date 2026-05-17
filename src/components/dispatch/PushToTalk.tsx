@@ -184,7 +184,7 @@ export function PushToTalk() {
               key={i}
               style={{
                 width: "3px",
-                height: `${Math.max(4, Math.round(level * 24 * (Math.random() * 0.5 + 0.5)))}px`,
+                height: `${Math.max(4, Math.round(level * 24 * (((Math.sin(i * 1.8) + 1) / 2) * 0.5 + 0.5)))}px`,
                 background: "#B23A2E",
                 borderRadius: "1.5px",
                 transition: "height 0.08s",

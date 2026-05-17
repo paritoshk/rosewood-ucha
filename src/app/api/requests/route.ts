@@ -1,22 +1,25 @@
-import { NextRequest, NextResponse } from "next/server";
-import type { DispatchRequest } from "@/lib/types";
-import { SEED_REQUESTS } from "@/lib/seed";
+import { NextRequest, NextResponse } from 'next/server';
+import type { DispatchRequest, Status } from '@/lib/types';
+import { getRequests, addRequest, updateStatus } from '@/lib/store';
 
-// Module-level store — resets on server restart, fine for demo
-let requests: DispatchRequest[] = [...SEED_REQUESTS];
+export const runtime = 'nodejs';
+export const dynamic = 'force-dynamic';
 
 export async function GET() {
-  return NextResponse.json(requests);
+  return NextResponse.json(await getRequests());
 }
 
 export async function POST(req: NextRequest) {
-  const body: DispatchRequest = await req.json();
-  requests = [body, ...requests];
+  const body = (await req.json()) as DispatchRequest;
+  await addRequest(body);
   return NextResponse.json(body, { status: 201 });
 }
 
 export async function PATCH(req: NextRequest) {
-  const { id, status } = await req.json();
-  requests = requests.map((r) => (r.id === id ? { ...r, status } : r));
+  const { id, status } = (await req.json()) as { id: string; status: Status };
+  const updated = await updateStatus(id, status);
+  if (!updated) {
+    return NextResponse.json({ error: 'Request not found' }, { status: 404 });
+  }
   return NextResponse.json({ ok: true });
 }

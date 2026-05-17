@@ -1,36 +1,55 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Üchá — voice dispatch for Rosewood Sand Hill
 
-## Getting Started
+Üchá is a voice-driven dispatch board for hotel staff. Speak a request and it is
+transcribed, routed to the correct department with a priority and ETA, enriched
+with guest CRM context, and posted to the live dispatch board.
 
-First, run the development server:
+## How it works
+
+1. **Capture** — staff hold the voice button and speak a request.
+2. **Transcribe** — `POST /api/voice` sends the audio to ElevenLabs Scribe
+   speech-to-text (`scribe_v1`).
+3. **Route** — the transcript is passed to Claude (`claude-haiku-4-5`) which uses
+   tool-calling to return a structured dispatch (department, priority, summary,
+   room, ETA). Guest tier is resolved from the CRM lookup and VIP requests are
+   escalated.
+4. **Acknowledge** — `POST /api/speak` synthesizes Üchá's spoken confirmation
+   with ElevenLabs text-to-speech (`eleven_flash_v2_5`) and plays it back.
+5. **Dispatch** — the request is stored and appears on `/dispatch`, which polls
+   `/api/requests` every few seconds.
+
+## Voice modes
+
+The top bar offers two ways to talk to Üchá, switchable with the toggle:
+
+- **Hold to speak** (default) — one-shot push-to-talk `VoiceButton`. Hold,
+  speak, release; the pipeline above runs once.
+- **Live agent** — `ConversationButton`, a continuous ElevenLabs Conversational
+  AI session. Requires a pre-created agent (`ELEVENLABS_AGENT_ID`); this app
+  never creates agents.
+
+## Demo
+
+Visit `/demo` (or "Demo Mode" in the top bar) to run scripted scenarios through
+the real pipeline — each one shows the transcribe → route → acknowledge steps
+and speaks the acknowledgment aloud.
+
+## Environment
+
+Create `.env.local` with:
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+ANTHROPIC_API_KEY=...     # Claude routing
+ELEVENLABS_API_KEY=...    # speech-to-text + text-to-speech
+ELEVENLABS_AGENT_ID=...   # required only for the live agent mode
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Development
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
-
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+```bash
+pnpm install
+pnpm dev      # http://localhost:3000
+pnpm lint
+pnpm test
+pnpm build
+```
