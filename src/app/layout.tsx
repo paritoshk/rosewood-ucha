@@ -26,7 +26,7 @@ export const metadata: Metadata = {
   },
   description:
     "Staff press one button, speak a request, and Üchá transcribes, routes, enriches with guest-360 context, and confirms — in seconds. Zero dropped requests.",
-  metadataBase: new URL("https://ucha.vercel.app"),
+  metadataBase: new URL("https://ucha-rosewood.vercel.app"),
   keywords: [
     "hotel dispatch",
     "voice AI",
