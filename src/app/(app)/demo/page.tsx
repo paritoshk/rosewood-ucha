@@ -204,9 +204,8 @@ export default function DemoPage() {
       style={{
         position: "relative",
         minHeight: "100%",
-        display: "flex",
-        justifyContent: "center",
         overflow: "hidden",
+        fontFamily: "var(--font-geist-sans), sans-serif",
       }}
     >
       {/* Faded brand monogram filling the side whitespace */}
@@ -232,14 +231,15 @@ export default function DemoPage() {
         R
       </div>
 
+      {/* Scenarios — narrow centered column */}
       <div
         style={{
           position: "relative",
           zIndex: 1,
           width: "100%",
           maxWidth: 900,
-          padding: "40px 48px",
-          fontFamily: "var(--font-geist-sans), sans-serif",
+          margin: "0 auto",
+          padding: "40px 48px 0",
         }}
       >
       {/* Header */}
@@ -631,8 +631,19 @@ export default function DemoPage() {
         })}
       </div>
 
-      {/* Live Dispatch Board */}
-      <div style={{ marginTop: 48 }}>
+      </div>{/* end scenarios */}
+
+      {/* Live Dispatch Board — full-width section */}
+      <div
+        style={{
+          position: "relative",
+          zIndex: 1,
+          width: "100%",
+          maxWidth: 1440,
+          margin: "0 auto",
+          padding: "48px 48px 0",
+        }}
+      >
         <div style={{ marginBottom: 20 }}>
           <h2
             style={{
@@ -658,9 +669,14 @@ export default function DemoPage() {
       {/* Footer note */}
       <div
         style={{
-          marginTop: 36,
-          paddingTop: 20,
+          position: "relative",
+          zIndex: 1,
+          width: "100%",
+          maxWidth: 900,
+          margin: "0 auto",
+          padding: "36px 48px 40px",
           borderTop: "1px solid var(--rw-border)",
+          marginTop: 36,
           fontSize: 11,
           color: "var(--rw-ink-faint)",
           lineHeight: 1.7,
@@ -668,7 +684,6 @@ export default function DemoPage() {
       >
         Use the <strong>Hold to speak</strong> button in the top bar for live voice dispatch — hold,
         speak any hotel request, release, and the full pipeline runs with your voice.
-      </div>
       </div>
     </div>
   );
