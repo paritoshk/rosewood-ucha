@@ -9,6 +9,7 @@ import {
   IconBed,
   IconChartBar,
   IconSettings,
+  IconPresentation,
 } from "@tabler/icons-react";
 
 const NAV_ITEMS = [
@@ -82,23 +83,47 @@ export function Sidebar() {
         })}
       </nav>
 
-      {/* Property initial */}
-      <div
-        style={{
-          width: 30,
-          height: 30,
-          borderRadius: "50%",
-          border: "1px solid rgba(244,239,228,0.3)",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          fontSize: 11,
-          fontWeight: 500,
-          letterSpacing: "0.05em",
-          color: "rgba(244,239,228,0.6)",
-        }}
-      >
-        R
+      {/* Bottom: Demo link + property badge */}
+      <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 12 }}>
+        <Link
+          href="/demo"
+          title="Live Demo"
+          style={{
+            width: 36,
+            height: 36,
+            borderRadius: "50%",
+            border: pathname === "/demo"
+              ? "1px solid var(--rw-parchment)"
+              : "1px solid rgba(244,239,228,0.35)",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            color: "var(--rw-parchment)",
+            opacity: pathname === "/demo" ? 1 : 0.6,
+            textDecoration: "none",
+            transition: "opacity 0.15s, border-color 0.15s",
+          }}
+        >
+          <IconPresentation size={15} strokeWidth={1.5} />
+        </Link>
+
+        <div
+          style={{
+            width: 30,
+            height: 30,
+            borderRadius: "50%",
+            border: "1px solid rgba(244,239,228,0.3)",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            fontSize: 11,
+            fontWeight: 500,
+            letterSpacing: "0.05em",
+            color: "rgba(244,239,228,0.6)",
+          }}
+        >
+          R
+        </div>
       </div>
     </aside>
   );

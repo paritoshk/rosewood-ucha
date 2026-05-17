@@ -17,11 +17,17 @@ const DEPT_LABELS: Record<string, string> = {
   concierge: "Concierge",
 };
 
+// "Roger" — a male American voice, the hotel staff member calling in. Distinct
+// from Lauren (Üchá) so the demo plays as a real two-person conversation.
+const STAFF_VOICE = "CwhRBWXzGAHq8TQ4Fs17";
+
 const SCENARIOS = [
   {
     id: 1,
     label: "Scenario 1",
     title: "Pinnacle Guest — Urgent Turndown",
+    narration:
+      "First, an urgent request for a Pinnacle guest. Listen as a staff member calls it in.",
     script:
       "Room 814 needs an urgent full turndown before the guest's dinner tonight at seven PM. Please send someone immediately.",
     context:
@@ -32,6 +38,8 @@ const SCENARIOS = [
     id: 2,
     label: "Scenario 2",
     title: "In-Room Safe Malfunction",
+    narration:
+      "Next, a maintenance issue — and the staff member adds a language request on top.",
     script:
       "The guest in room 1101 can't open the in-room safe. He's also asking for a German-speaking staff member if possible.",
     context:
@@ -42,6 +50,8 @@ const SCENARIOS = [
     id: 3,
     label: "Scenario 3",
     title: "VIP Airport Transfer",
+    narration:
+      "And finally, a VIP airport transfer. Watch the concierge routing pull her car preference.",
     script:
       "Doctor Osei in room 1204 needs a Tesla or electric vehicle to SFO Terminal 3 tomorrow morning at five AM.",
     context:
@@ -71,29 +81,54 @@ export default function DemoPage() {
   const [results, setResults] = useState<Record<number, Result>>({});
   const [errors, setErrors] = useState<Record<number, string>>({});
   const [runningAll, setRunningAll] = useState(false);
+  const [speaking, setSpeaking] = useState<{ id: number; who: string } | null>(
+    null,
+  );
 
   function setStep(id: number, step: Step) {
     setSteps((s) => ({ ...s, [id]: step }));
   }
 
-  async function playAcknowledgment(text: string) {
+  // Synthesize `text` via /api/speak and play it to completion. `who` drives the
+  // on-screen "speaking" indicator; omitting voiceId uses Lauren (Üchá).
+  async function playClip(
+    text: string,
+    opts: { id: number; who: string; voiceId?: string },
+  ): Promise<void> {
+    if (!text?.trim()) return;
+    setSpeaking({ id: opts.id, who: opts.who });
     try {
       const res = await fetch("/api/speak", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ text }),
+        body: JSON.stringify(
+          opts.voiceId ? { text, voice_id: opts.voiceId } : { text },
+        ),
       });
-      if (!res.ok) return;
-      const url = URL.createObjectURL(await res.blob());
-      const audio = new Audio(url);
-      audio.onended = () => URL.revokeObjectURL(url);
-      await audio.play().catch(() => {});
+      if (res.ok) {
+        const url = URL.createObjectURL(await res.blob());
+        await new Promise<void>((resolve) => {
+          const audio = new Audio(url);
+          const done = () => {
+            URL.revokeObjectURL(url);
+            resolve();
+          };
+          audio.onended = done;
+          audio.onerror = done;
+          audio.play().catch(done);
+        });
+      }
     } catch {
-      /* TTS is non-critical */
+      /* audio is non-critical — the pipeline still runs */
+    } finally {
+      setSpeaking(null);
     }
   }
 
-  async function runScenario(id: number, script: string): Promise<void> {
+  async function runScenario(
+    scenario: (typeof SCENARIOS)[number],
+  ): Promise<void> {
+    const { id, script, narration } = scenario;
     const current = steps[id];
     if (current === "tts" || current === "stt" || current === "routing") return;
 
@@ -104,10 +139,13 @@ export default function DemoPage() {
       return n;
     });
 
-    // Show the TTS step label for ~600ms before the actual request starts
-    await new Promise((r) => setTimeout(r, 600));
+    // Üchá narrates the scene, then the staff member speaks the request aloud —
+    // two voices, a real conversation.
+    await playClip(narration, { id, who: "Üchá" });
+    await playClip(script, { id, who: "Staff", voiceId: STAFF_VOICE });
+
     setStep(id, "stt");
-    await new Promise((r) => setTimeout(r, 500));
+    await new Promise((r) => setTimeout(r, 400));
     setStep(id, "routing");
 
     try {
@@ -124,8 +162,11 @@ export default function DemoPage() {
       }
       setResults((r) => ({ ...r, [id]: data as Result }));
       setStep(id, "done");
-      const ack = (data as Result).request.acknowledgment;
-      if (ack) await playAcknowledgment(ack);
+      // Üchá reads her acknowledgment back — the other half of the conversation.
+      await playClip((data as Result).request.acknowledgment ?? "", {
+        id,
+        who: "Üchá",
+      });
     } catch {
       setStep(id, "error");
       setErrors((e) => ({ ...e, [id]: "Network error — check console" }));
@@ -136,7 +177,7 @@ export default function DemoPage() {
     if (runningAll) return;
     setRunningAll(true);
     for (const s of SCENARIOS) {
-      await runScenario(s.id, s.script);
+      await runScenario(s);
       await new Promise((r) => setTimeout(r, 600));
     }
     setRunningAll(false);
@@ -147,6 +188,7 @@ export default function DemoPage() {
     setResults({});
     setErrors({});
     setRunningAll(false);
+    setSpeaking(null);
   }
 
   return (
@@ -295,7 +337,7 @@ export default function DemoPage() {
                 </div>
 
                 <button
-                  onClick={() => runScenario(scenario.id, scenario.script)}
+                  onClick={() => runScenario(scenario)}
                   disabled={isActive || runningAll}
                   style={{
                     flexShrink: 0,
@@ -323,6 +365,30 @@ export default function DemoPage() {
                   {isDone ? "✓ Re-run" : STEP_LABELS[step]}
                 </button>
               </div>
+
+              {/* Now-speaking indicator — shows which voice is talking */}
+              {speaking?.id === scenario.id && (
+                <div
+                  style={{
+                    padding: "8px 20px",
+                    borderTop: "1px solid var(--rw-border)",
+                    display: "flex",
+                    alignItems: "center",
+                    gap: 8,
+                    fontSize: 11,
+                    letterSpacing: "0.04em",
+                    color: "var(--rw-green)",
+                    background: "rgba(46,125,82,0.05)",
+                  }}
+                >
+                  <span style={{ animation: "ucha-pulse 1.3s infinite" }}>
+                    🔊
+                  </span>
+                  {speaking.who === "Staff"
+                    ? "Staff member speaking…"
+                    : "Üchá speaking…"}
+                </div>
+              )}
 
               {/* Pipeline steps indicator */}
               {(isActive || isDone) && (
