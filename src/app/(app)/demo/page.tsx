@@ -111,23 +111,12 @@ export default function DemoPage() {
         const url = URL.createObjectURL(await res.blob());
         await new Promise<void>((resolve) => {
           const audio = new Audio(url);
-          let timer: ReturnType<typeof setTimeout>;
           const done = () => {
-            clearTimeout(timer);
             URL.revokeObjectURL(url);
             resolve();
           };
           audio.onended = done;
           audio.onerror = done;
-          // Resolve right after the clip's real length even if `ended` is
-          // flaky; a hard cap covers the case where metadata never loads.
-          audio.onloadedmetadata = () => {
-            if (Number.isFinite(audio.duration)) {
-              clearTimeout(timer);
-              timer = setTimeout(done, audio.duration * 1000 + 1500);
-            }
-          };
-          timer = setTimeout(done, 25000);
           audio.play().catch(done);
         });
       }
