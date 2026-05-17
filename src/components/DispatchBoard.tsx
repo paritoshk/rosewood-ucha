@@ -39,12 +39,7 @@ export function DispatchBoard() {
 
   return (
     <div
-      style={{
-        display: "grid",
-        gridTemplateColumns: "repeat(4, 1fr)",
-        gap: 24,
-        alignItems: "start",
-      }}
+      className="dispatch-grid"
     >
       {DEPT_ORDER.map((dept) => {
         const config = DEPT_CONFIG[dept];
