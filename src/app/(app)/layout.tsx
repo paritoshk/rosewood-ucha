@@ -19,16 +19,11 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
             display: "flex",
             flexDirection: "column",
             overflow: "hidden",
+            minWidth: 0,
           }}
         >
           <TopBar />
-          <main
-            style={{
-              flex: 1,
-              overflowY: "auto",
-              padding: "32px",
-            }}
-          >
+          <main className="app-main">
             {children}
           </main>
         </div>

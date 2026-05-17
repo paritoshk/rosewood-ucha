@@ -10,6 +10,7 @@ import {
   IconChartBar,
   IconSettings,
   IconPresentation,
+  IconPlug,
 } from "@tabler/icons-react";
 
 const NAV_ITEMS = [
@@ -18,6 +19,7 @@ const NAV_ITEMS = [
   { href: "/guests", icon: IconUsers, label: "Guests" },
   { href: "/rooms", icon: IconBed, label: "Rooms" },
   { href: "/insights", icon: IconChartBar, label: "Insights" },
+  { href: "/integrations", icon: IconPlug, label: "Integrations" },
   { href: "/settings", icon: IconSettings, label: "Settings" },
 ] as const;
 
@@ -25,19 +27,9 @@ export function Sidebar() {
   const pathname = usePathname();
 
   return (
-    <aside
-      style={{
-        width: 64,
-        flexShrink: 0,
-        background: "var(--rw-green)",
-        display: "flex",
-        flexDirection: "column",
-        alignItems: "center",
-        justifyContent: "space-between",
-        paddingTop: 20,
-        paddingBottom: 20,
-      }}
-    >
+    <>
+    {/* Desktop sidebar */}
+    <aside className="hidden md:flex sidebar-desktop">
       {/* Monogram */}
       <div
         style={{
@@ -126,5 +118,28 @@ export function Sidebar() {
         </div>
       </div>
     </aside>
+
+    {/* Mobile bottom nav */}
+    <nav className="md:hidden mobile-bottom-nav">
+      {NAV_ITEMS.slice(0, 5).map(({ href, icon: Icon, label }) => {
+        const active = pathname === href || pathname.startsWith(href + "/");
+        return (
+          <Link
+            key={href}
+            href={href}
+            title={label}
+            className="mobile-nav-item"
+            style={{
+              opacity: active ? 1 : 0.45,
+              color: active ? "var(--rw-green)" : "var(--rw-ink)",
+            }}
+          >
+            <Icon size={20} strokeWidth={1.5} />
+            <span className="mobile-nav-label">{label}</span>
+          </Link>
+        );
+      })}
+    </nav>
+    </>
   );
 }

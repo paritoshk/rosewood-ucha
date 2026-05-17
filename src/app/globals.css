@@ -193,3 +193,125 @@
 ::-webkit-scrollbar { width: 8px; height: 8px; }
 ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 8px; }
 ::-webkit-scrollbar-track { background: transparent; }
+
+/* ─── Layout: sidebar, topbar, main ─── */
+
+.sidebar-desktop {
+  width: 64px;
+  flex-shrink: 0;
+  background: var(--rw-green);
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  padding-top: 20px;
+  padding-bottom: 20px;
+}
+
+.topbar {
+  height: 48px;
+  flex-shrink: 0;
+  background: var(--rw-parchment);
+  border-bottom: 1px solid var(--rw-border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-left: 24px;
+  padding-right: 24px;
+}
+@media (max-width: 767px) {
+  .topbar {
+    padding-left: 16px;
+    padding-right: 16px;
+  }
+}
+
+.app-main {
+  flex: 1;
+  overflow-y: auto;
+  padding: 32px;
+}
+@media (max-width: 767px) {
+  .app-main {
+    padding: 16px;
+    padding-bottom: 72px; /* space for mobile nav */
+  }
+}
+
+/* ─── Mobile bottom nav ─── */
+
+.mobile-bottom-nav {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 56px;
+  background: var(--rw-parchment);
+  border-top: 1px solid var(--rw-border);
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  z-index: 50;
+}
+
+.mobile-nav-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  text-decoration: none;
+  transition: opacity 0.15s;
+}
+
+.mobile-nav-label {
+  font-size: 9px;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+/* ─── Dispatch grid ─── */
+
+.dispatch-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 24px;
+  align-items: start;
+}
+@media (max-width: 1023px) {
+  .dispatch-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
+  }
+}
+@media (max-width: 639px) {
+  .dispatch-grid {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+}
+
+/* ─── Integrations grid ─── */
+
+.integrations-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+}
+@media (max-width: 1023px) {
+  .integrations-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+@media (max-width: 639px) {
+  .integrations-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ─── Login page mobile ─── */
+
+@media (max-width: 639px) {
+  .rw-room {
+    font-size: 24px;
+  }
+}

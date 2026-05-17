@@ -39,19 +39,7 @@ export function TopBar() {
   const pageName = PAGE_NAMES[pathname] ?? "";
 
   return (
-    <header
-      style={{
-        height: 48,
-        flexShrink: 0,
-        background: "var(--rw-parchment)",
-        borderBottom: "1px solid var(--rw-border)",
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "space-between",
-        paddingLeft: 24,
-        paddingRight: 24,
-      }}
-    >
+    <header className="topbar">
       {/* Breadcrumb */}
       <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
         <span
@@ -84,16 +72,14 @@ export function TopBar() {
       </div>
 
       {/* Clock */}
-      <div
-        style={{
-          fontSize: 14,
-          fontFamily: "var(--font-geist-mono), monospace",
-          letterSpacing: "0.08em",
-          color: "var(--rw-ink-muted)",
-          minWidth: 100,
-          textAlign: "center",
-        }}
-      >
+      <div className="hidden sm:block" style={{
+        fontSize: 14,
+        fontFamily: "var(--font-geist-mono), monospace",
+        letterSpacing: "0.08em",
+        color: "var(--rw-ink-muted)",
+        minWidth: 100,
+        textAlign: "center",
+      }}>
         {time}
       </div>
 
@@ -101,8 +87,8 @@ export function TopBar() {
       <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
         <Link
           href="/demo"
-          className="rw-btn-ghost"
-          style={{ display: "flex", alignItems: "center", gap: 6 }}
+          className="rw-btn-ghost hidden sm:flex"
+          style={{ alignItems: "center", gap: 6 }}
         >
           <IconPlayerPlay size={10} />
           Demo Mode
@@ -112,7 +98,7 @@ export function TopBar() {
         <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
           {voiceMode === "push" ? <VoiceButton /> : <ConversationButton />}
           <button
-            className="rw-btn-ghost"
+            className="rw-btn-ghost hidden sm:inline-flex"
             onClick={() => setVoiceMode((m) => (m === "push" ? "live" : "push"))}
             title={
               voiceMode === "push"
@@ -124,7 +110,7 @@ export function TopBar() {
           </button>
         </div>
 
-        <span className="rw-label" style={{ opacity: 0.6 }}>
+        <span className="rw-label hidden lg:inline" style={{ opacity: 0.6 }}>
           Rosewood Sand Hill
         </span>
       </div>
