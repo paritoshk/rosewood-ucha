@@ -1,31 +1,7 @@
 import { DispatchBoard } from "@/components/DispatchBoard";
-import { VoiceButton } from "@/components/VoiceButton";
 
+// Push-to-talk now lives in the TopBar (available from every page), so the
+// dispatch board is the full main view.
 export default function DispatchPage() {
-  return (
-    <div>
-      {/* Voice capture */}
-      <div
-        style={{
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "center",
-          paddingBottom: 40,
-          borderBottom: "1px solid var(--rw-border)",
-          marginBottom: 32,
-        }}
-      >
-        <p
-          className="rw-label"
-          style={{ marginBottom: 20, opacity: 0.6 }}
-        >
-          New Request
-        </p>
-        <VoiceButton />
-      </div>
-
-      {/* Board */}
-      <DispatchBoard />
-    </div>
-  );
+  return <DispatchBoard />;
 }
