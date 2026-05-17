@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
-import { ConversationButton } from "@/components/ConversationButton";
+import { VoiceButton } from "@/components/VoiceButton";
 
 const PAGE_NAMES: Record<string, string> = {
   "/dispatch": "Dispatch",
@@ -95,7 +95,7 @@ export function TopBar() {
 
       {/* Right — push-to-talk, available from every page */}
       <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
-        <ConversationButton />
+        <VoiceButton />
         <span className="rw-label" style={{ opacity: 0.6 }}>
           Rosewood Sand Hill
         </span>
