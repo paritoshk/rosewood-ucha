@@ -55,15 +55,26 @@ export function VoiceButton() {
       const fd = new FormData();
       fd.append("audio", blob, "recording.webm");
       const res = await fetch("/api/voice", { method: "POST", body: fd });
-      const data = await res.json();
+      const data = (await res.json()) as {
+        request?: DispatchRequest;
+        acknowledgment?: string;
+        reply?: string;
+        transcript?: string;
+        error?: string;
+      };
       if (!res.ok) {
         setHint(data?.error ?? "Something went wrong.");
         return;
       }
-      const request = data as DispatchRequest;
-      if (request.transcript) setLastTranscript(request.transcript);
-      await addRequest(request);
-      if (request.acknowledgment) await playAcknowledgment(request.acknowledgment);
+      if (data.transcript) setLastTranscript(data.transcript);
+      if (data.request) {
+        // A new service request — drop the card on the board.
+        await addRequest(data.request);
+        if (data.acknowledgment) await playAcknowledgment(data.acknowledgment);
+      } else if (data.reply) {
+        // A question or status remark — Üchá just answers, no card.
+        await playAcknowledgment(data.reply);
+      }
     } catch {
       setHint("Network error — try again.");
     } finally {

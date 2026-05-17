@@ -3,6 +3,7 @@ import Anthropic from '@anthropic-ai/sdk';
 import { nanoid } from 'nanoid';
 import { DISPATCH_MODEL, DISPATCH_SYSTEM_PROMPT, ROUTE_TOOL } from '@/lib/prompt';
 import { resolveGuest, escalatePriority } from '@/lib/crm/lookup';
+import { getRequests } from '@/lib/store';
 import type { DispatchRequest, Department, Priority } from '@/lib/types';
 
 export const runtime = 'nodejs';
@@ -20,8 +21,12 @@ interface Routing {
 }
 
 /**
- * Real voice pipeline: audio → ElevenLabs STT → Claude (tool use) routing →
- * fake-CRM guest enrichment → a DispatchRequest the board can render.
+ * Real voice pipeline: audio → ElevenLabs STT → Claude.
+ *
+ * Claude decides what the staff member meant: a NEW service request → it calls
+ * route_request and we return an enriched DispatchRequest for the board; a
+ * QUESTION or status remark ("what are my action items") → it answers in prose
+ * and we return that spoken reply with no card.
  */
 export async function POST(req: Request) {
   try {
@@ -67,25 +72,42 @@ export async function POST(req: Request) {
       );
     }
 
-    // 2. Route with Claude — tool use guarantees a valid structured object.
+    // 2. Claude decides: dispatch a new request, or answer a staff question.
+    //    The current board is passed so questions can be answered accurately.
+    const board = (await getRequests()).filter((r) => r.status !== 'resolved');
+    const boardSummary = board.length
+      ? board
+          .map(
+            (r) =>
+              `- [${r.priority}] ${r.department}, room ${r.room}: ${r.summary} (${r.status})`,
+          )
+          .join('\n')
+      : '(no active requests)';
+
     const anthropic = new Anthropic({ apiKey: anthropicKey });
     const message = await anthropic.messages.create({
       model: DISPATCH_MODEL,
-      max_tokens: 400,
+      max_tokens: 600,
       temperature: 0,
       system: DISPATCH_SYSTEM_PROMPT,
       tools: [ROUTE_TOOL],
-      tool_choice: { type: 'tool', name: ROUTE_TOOL.name },
       messages: [
-        { role: 'user', content: `Staff request (transcript): "${transcript}"` },
+        {
+          role: 'user',
+          content: `CURRENT BOARD:\n${boardSummary}\n\nStaff member said (voice transcript): "${transcript}"`,
+        },
       ],
     });
+
+    // No tool call → a question or status remark. Return the spoken reply, no card.
     const toolUse = message.content.find((b) => b.type === 'tool_use');
     if (!toolUse || toolUse.type !== 'tool_use') {
-      return NextResponse.json(
-        { error: 'Could not route that request.' },
-        { status: 502 },
-      );
+      const textBlock = message.content.find((b) => b.type === 'text');
+      const reply =
+        textBlock && textBlock.type === 'text' && textBlock.text.trim()
+          ? textBlock.text.trim()
+          : "I didn't catch a request there — try again.";
+      return NextResponse.json({ reply, transcript });
     }
     const routing = toolUse.input as Routing;
 
@@ -108,7 +130,8 @@ export async function POST(req: Request) {
       department: routing.department,
       room: routing.room?.trim() || '—',
       summary: routing.summary,
-      guestName: guest?.name ?? 'Guest',
+      // No fabricated guest — empty when the room resolves to no one on file.
+      guestName: guest?.name ?? '',
       guestTier: guest?.tier ?? 'Standard',
       guestPrefs: guest?.prefs ?? '',
       priority,
@@ -119,7 +142,7 @@ export async function POST(req: Request) {
       transcript,
       escalated,
     };
-    return NextResponse.json(request);
+    return NextResponse.json({ request, acknowledgment, transcript });
   } catch (err) {
     const message = err instanceof Error ? err.message : 'Unknown error';
     return NextResponse.json({ error: message }, { status: 500 });
