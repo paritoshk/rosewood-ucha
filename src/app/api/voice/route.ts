@@ -4,6 +4,7 @@ import { nanoid } from 'nanoid';
 import { DISPATCH_MODEL, DISPATCH_SYSTEM_PROMPT, ROUTE_TOOL } from '@/lib/prompt';
 import { resolveGuest, escalatePriority } from '@/lib/crm/lookup';
 import { getRequests } from '@/lib/store';
+import { postToTeams } from '@/lib/teams';
 import type { DispatchRequest, Department, Priority } from '@/lib/types';
 
 export const runtime = 'nodejs';
@@ -163,6 +164,7 @@ export async function POST(req: Request) {
       transcript,
       escalated,
     };
+    void postToTeams(request);
     return NextResponse.json({ request, acknowledgment, transcript });
   } catch (err) {
     const message = err instanceof Error ? err.message : 'Unknown error';

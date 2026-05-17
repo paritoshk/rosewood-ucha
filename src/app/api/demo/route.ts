@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import Anthropic from '@anthropic-ai/sdk';
 import { nanoid } from 'nanoid';
 import { addRequest } from '@/lib/store';
+import { postToTeams } from '@/lib/teams';
 import { resolveGuest, escalatePriority } from '@/lib/crm/lookup';
 import { DISPATCH_SYSTEM_PROMPT, DISPATCH_MODEL, ROUTE_TOOL } from '@/lib/prompt';
 import type { Department, Priority, DispatchRequest } from '@/lib/types';
@@ -118,6 +119,7 @@ export async function POST(req: Request) {
 
     // 5. Persist to board — the dispatch board picks it up on next poll.
     await addRequest(request);
+    void postToTeams(request);
 
     return NextResponse.json({ transcript, request });
   } catch (err) {
