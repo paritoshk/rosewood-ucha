@@ -21,6 +21,8 @@ export interface DispatchRequest {
   transcript?: string;
   /** True when priority was bumped because the guest is a VIP/Pinnacle. */
   escalated?: boolean;
+  /** Staff member currently handling this request. */
+  assignedTo?: string;
 }
 
 export interface Guest {
