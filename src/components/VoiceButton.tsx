@@ -79,8 +79,8 @@ export function VoiceButton() {
       if (data.transcript && spoken) {
         historyRef.current = [
           ...historyRef.current,
-          { role: "user", content: data.transcript },
-          { role: "assistant", content: spoken },
+          { role: "user" as const, content: data.transcript },
+          { role: "assistant" as const, content: spoken },
         ].slice(-12);
       }
 
