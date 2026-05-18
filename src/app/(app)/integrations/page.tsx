@@ -7,6 +7,7 @@ import {
   IconMessage,
   IconShieldLock,
   IconChartBar,
+  IconBrandTeams,
 } from "@tabler/icons-react";
 
 const INTEGRATIONS = [
@@ -103,6 +104,17 @@ const INTEGRATIONS = [
         name: "OneTrust",
         role: "Consent & privacy management",
         status: "Available" as const,
+      },
+    ],
+  },
+  {
+    category: "Staff Collaboration",
+    icon: IconBrandTeams,
+    items: [
+      {
+        name: "Microsoft Teams",
+        role: "Incoming webhook — dispatch alerts posted to staff channel on every routed request",
+        status: "Connected" as const,
       },
     ],
   },
