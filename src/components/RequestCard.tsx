@@ -125,6 +125,33 @@ export function RequestCard({ request }: Props) {
       </div>
       )}
 
+      {/* Assigned staff */}
+      {request.assignedTo && (
+        <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 10 }}>
+          <span
+            style={{
+              display: "inline-flex",
+              alignItems: "center",
+              justifyContent: "center",
+              width: 18,
+              height: 18,
+              borderRadius: "50%",
+              background: "rgba(46,125,82,0.12)",
+              color: "var(--rw-green)",
+              fontSize: 8,
+              fontWeight: 700,
+              letterSpacing: "0.02em",
+              flexShrink: 0,
+            }}
+          >
+            {request.assignedTo.split(" ").map((n) => n[0]).join("")}
+          </span>
+          <span style={{ fontSize: 11, color: "var(--rw-ink-muted)" }}>
+            {request.assignedTo}
+          </span>
+        </div>
+      )}
+
       {/* Bottom: ETA + action */}
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
         <span style={{ fontSize: 11, color: "var(--rw-ink-faint)" }}>

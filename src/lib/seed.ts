@@ -13,6 +13,7 @@ export const SEED_REQUESTS: DispatchRequest[] = [
     status: "pending",
     createdAt: new Date(Date.now() - 12 * 60000).toISOString(),
     eta: "15 min",
+    assignedTo: "Ling Chen",
   },
   {
     id: "req-002",
@@ -26,6 +27,7 @@ export const SEED_REQUESTS: DispatchRequest[] = [
     status: "in_progress",
     createdAt: new Date(Date.now() - 28 * 60000).toISOString(),
     eta: "8 min",
+    assignedTo: "Raj Patel",
   },
   {
     id: "req-003",
@@ -39,6 +41,7 @@ export const SEED_REQUESTS: DispatchRequest[] = [
     status: "pending",
     createdAt: new Date(Date.now() - 5 * 60000).toISOString(),
     eta: "5 min",
+    assignedTo: "Sofia Reyes",
   },
   {
     id: "req-004",
@@ -52,6 +55,7 @@ export const SEED_REQUESTS: DispatchRequest[] = [
     status: "pending",
     createdAt: new Date(Date.now() - 18 * 60000).toISOString(),
     eta: "20 min",
+    assignedTo: "André Beaumont",
   },
   {
     id: "req-005",
@@ -91,6 +95,7 @@ export const SEED_REQUESTS: DispatchRequest[] = [
     status: "in_progress",
     createdAt: new Date(Date.now() - 60 * 60000).toISOString(),
     eta: "Confirmed",
+    assignedTo: "Yuki Tanaka",
   },
 ];
 
