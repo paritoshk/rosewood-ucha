@@ -11,10 +11,12 @@ import {
   IconSettings,
   IconPresentation,
   IconPlug,
+  IconSparkles,
 } from "@tabler/icons-react";
 
 const NAV_ITEMS = [
   { href: "/dispatch", icon: IconSpeakerphone, label: "Dispatch" },
+  { href: "/ask", icon: IconSparkles, label: "Ask Üchá" },
   { href: "/activity", icon: IconList, label: "Activity" },
   { href: "/guests", icon: IconUsers, label: "Guests" },
   { href: "/rooms", icon: IconBed, label: "Rooms" },
